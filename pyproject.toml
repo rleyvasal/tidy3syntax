@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=77.0.3", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tidysyntax"
+dynamic = ["version"]
+description = "R syntax in notebook cells, rewritten to Python: shared by tidy3, tidy3a, plot3 and stats3"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Rigoberto Leyva Salmeron" }]
+keywords = ["notebooks", "ipython", "jupyter", "R", "formulas", "tidyverse"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Framework :: IPython",
+  "Framework :: Jupyter",
+  "Programming Language :: Python :: 3",
+]
+# The standard library only. IPython is optional and imported only by the notebook integration.
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+
+[project.urls]
+Homepage = "https://github.com/rleyvasal/tidysyntax"
+
+[tool.setuptools.dynamic]
+version = { attr = "tidysyntax.__version__.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+tidysyntax = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "tests"]
