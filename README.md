@@ -1,4 +1,4 @@
-# tidysyntax
+# tidy3syntax
 
 R syntax in notebook cells, rewritten to Python. It is the shared notebook
 layer of [tidy3](https://github.com/rleyvasal/tidy3),
@@ -8,7 +8,7 @@ layer of [tidy3](https://github.com/rleyvasal/tidy3),
 reaches all four at once. It needs only the standard library.
 
 ```python
-import tidysyntax as ts
+import tidy3syntax as ts
 
 stats3 = ts.Dialect("stats3", formula_calls={"t_test", "lm"})
 tidy3 = ts.Dialect("tidy3", negation_calls={"filter"}, ordered_calls={"select"},
@@ -67,8 +67,8 @@ turns them into its column references inside its calls.
 ## Status
 
 Phases 1 to 5 of [the design](docs/design.md): the scanner, every repair,
-the ownership rule and the two reinterpretations, used by tidy3 0.15, tidy3a
-0.16, plot3 0.8 and stats3 0.6. Not yet
+the ownership rule and the two reinterpretations, used by tidy3 0.15.1, tidy3a
+0.16.1, plot3 0.8.1 and stats3 0.6.1. Not yet
 here: the IPython coordinator that installs one transformer for all packages,
 continuation lines (`>>` for tidy3, `+` for plot3), and entry points.
 

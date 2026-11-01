@@ -14,7 +14,7 @@ import test_reinterpretations
 import test_repairs
 from dialects import ALL
 
-from tidysyntax import repair, rewrite
+from tidy3syntax import repair, rewrite
 
 # Modules whose source calls filter(), select(), count(), and the like.
 STDLIB = ["ast", "inspect", "textwrap", "json.decoder", "pathlib", "argparse", "selectors", "difflib", "fnmatch"]

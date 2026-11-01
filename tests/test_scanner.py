@@ -1,6 +1,6 @@
 import pytest
 
-from tidysyntax.scanner import Spans, arguments, calls, keyword, top_level_tildes
+from tidy3syntax.scanner import Spans, arguments, calls, keyword, top_level_tildes
 
 
 def code(source):

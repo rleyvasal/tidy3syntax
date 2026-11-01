@@ -23,7 +23,7 @@ from collections.abc import Iterable, Mapping, Sequence
 from types import ModuleType
 from typing import Any
 
-from tidysyntax.dialect import Dialect
+from tidy3syntax.dialect import Dialect
 
 
 class ModuleRef(str):

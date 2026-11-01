@@ -25,7 +25,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
-      - name: Install tidysyntax
+      - name: Install tidy3syntax
         run: python -m pip install -e ".[dev]"
       - name: Run tests
         run: python -m pytest -q --tb=short
@@ -48,7 +48,7 @@ jobs:
         run: |
           python -m venv /tmp/clean
           /tmp/clean/bin/pip install dist/*.whl
-          cd /tmp && /tmp/clean/bin/python -c "import tidysyntax as t; d = t.Dialect('stats3', formula_calls={'lm'}, exports={'lm'}); print(t.rewrite('lm(y ~ x)', [d]), t.__version__)"
+          cd /tmp && /tmp/clean/bin/python -c "import tidy3syntax as t; d = t.Dialect('stats3', formula_calls={'lm'}, exports={'lm'}); print(t.rewrite('lm(y ~ x)', [d]), t.__version__)"
       - name: Save validated distributions
         uses: actions/upload-artifact@v7
         with:

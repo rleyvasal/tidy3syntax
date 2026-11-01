@@ -2,7 +2,7 @@
 
 import re
 
-from tidysyntax import ASSIGN, Dialect
+from tidy3syntax import ASSIGN, Dialect
 
 TIDY3_VERBS = frozenset({
     "add_count", "add_tally", "arrange", "case_match", "case_when", "chop", "complete", "count", "distinct",

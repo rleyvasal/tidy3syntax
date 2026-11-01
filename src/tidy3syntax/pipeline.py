@@ -13,10 +13,10 @@ import ast
 from collections.abc import Collection, Mapping, Sequence
 from typing import Any
 
-from tidysyntax.dialect import Dialect
-from tidysyntax.ownership import owned_calls
-from tidysyntax.repairs import formula_text, is_shell_cell, repair
-from tidysyntax.scanner import (
+from tidy3syntax.dialect import Dialect
+from tidy3syntax.ownership import owned_calls
+from tidy3syntax.repairs import formula_text, is_shell_cell, repair
+from tidy3syntax.scanner import (
     Call,
     Spans,
     apply,

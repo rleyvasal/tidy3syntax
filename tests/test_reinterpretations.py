@@ -10,7 +10,7 @@ import types
 import pytest
 from dialects import ALL, PLOT3
 
-from tidysyntax import ModuleRef, imported_names, rewrite
+from tidy3syntax import ModuleRef, imported_names, rewrite
 
 USER_GEOM_FUNCTION = "def geom_function(fun):\n    return fun(3)\n"
 

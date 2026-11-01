@@ -8,7 +8,7 @@ tidy3a's ``test_notebooks.py``, plot3's ``test_masking.py`` and stats3's
 import pytest
 from dialects import ALL, PLOT3, STATS3, TIDY3, TIDY3A
 
-from tidysyntax import Dialect, repair
+from tidy3syntax import Dialect, repair
 
 
 @pytest.mark.parametrize(

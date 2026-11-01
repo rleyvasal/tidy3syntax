@@ -26,7 +26,7 @@ jobs:
           python - <<'PY'
           import os
           import runpy
-          version = runpy.run_path("src/tidysyntax/__version__.py")["__version__"]
+          version = runpy.run_path("src/tidy3syntax/__version__.py")["__version__"]
           if ".dev" in version or os.environ["GITHUB_REF"] != f"refs/tags/v{version}":
               raise SystemExit(f"Release tag must be v{version}, with a non-development version")
           PY
@@ -43,7 +43,7 @@ jobs:
     timeout-minutes: 10
     environment:
       name: pypi
-      url: https://pypi.org/project/tidysyntax/
+      url: https://pypi.org/project/tidy3syntax/
     permissions:
       id-token: write
     steps:

@@ -1,0 +1,16 @@
+# R for stats3's oracle tests on the test machine, with no system packages:
+# R 4.6 (the release stats3 and its CI match) and compilers from conda-forge,
+# then the packages the oracle compares against from CRAN (install.R), current
+# as in stats3's CI. conda-forge has no R 4.6 builds of those packages yet
+# (2026-11-01), so install.R builds them and their dependencies from source.
+[workspace]
+name = "r-oracle"
+channels = ["conda-forge"]
+platforms = ["linux-64"]
+
+[dependencies]
+r-base = "4.6.*"
+compilers = "*"
+make = "*"
+cmake = "*"
+pkg-config = "*"

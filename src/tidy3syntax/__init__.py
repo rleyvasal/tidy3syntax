@@ -7,18 +7,18 @@ reads differently) run only in the package's own calls. See
 ``docs/design.md``.
 """
 
-from tidysyntax.__version__ import __version__
-from tidysyntax.dialect import Dialect
-from tidysyntax.ownership import (
+from tidy3syntax.__version__ import __version__
+from tidy3syntax.dialect import Dialect
+from tidy3syntax.ownership import (
     ModuleRef,
     Owners,
     imported_names,
     module_of,
     owned_calls,
 )
-from tidysyntax.pipeline import reinterpret, rewrite
-from tidysyntax.placeholders import ASSIGN, NAME, RAssign, RName, runtime_values
-from tidysyntax.repairs import repair
+from tidy3syntax.pipeline import reinterpret, rewrite
+from tidy3syntax.placeholders import ASSIGN, NAME, RAssign, RName, runtime_values
+from tidy3syntax.repairs import repair
 
 __all__ = [
     "ASSIGN",

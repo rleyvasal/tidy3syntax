@@ -19,9 +19,9 @@ import ast
 import re
 from collections.abc import Iterable, Sequence
 
-from tidysyntax.dialect import Dialect
-from tidysyntax.placeholders import ASSIGN, NAME
-from tidysyntax.scanner import (
+from tidy3syntax.dialect import Dialect
+from tidy3syntax.placeholders import ASSIGN, NAME
+from tidy3syntax.scanner import (
     Call,
     Spans,
     apply,
@@ -32,7 +32,7 @@ from tidysyntax.scanner import (
 )
 
 _BACKTICK = re.compile(r"`([^`\n]+)`")
-# Placeholders a package's own pass may have left before tidysyntax ran (tidy3, plot3), and tidysyntax's own.
+# Placeholders a package's own pass may have left before tidy3syntax ran (tidy3, plot3), and tidy3syntax's own.
 _NAME_CALL = re.compile(r"__(?:r_name|tidy3_bt|plot3_bt)__\((['\"])(.*?)\1\)")
 
 

@@ -19,9 +19,9 @@ class Dialect:
     """Which calls of one package take which piece of R syntax.
 
     Fields under *repairs* name calls whose arguments may hold text that is
-    not Python; tidysyntax rewrites those by the call's name, whoever owns
+    not Python; tidy3syntax rewrites those by the call's name, whoever owns
     the call. Fields under *reinterpretations* name calls whose arguments
-    may hold valid Python that the package reads differently; tidysyntax
+    may hold valid Python that the package reads differently; tidy3syntax
     rewrites those only in calls the package owns (see ``ownership``).
     Names are the functions' names, without a module prefix.
     """
