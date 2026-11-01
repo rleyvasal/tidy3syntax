@@ -69,7 +69,7 @@ def reinterpret(
 
     def applies(call: Call, field: str) -> bool:
         for dialect in active:
-            if call.name in getattr(dialect, field) and (
+            if dialect.lists(field, call.name, call.prefix) and (
                 owned.get(call.name_end) == dialect.package or dialect.package in always
             ):
                 return True

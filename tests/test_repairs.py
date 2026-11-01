@@ -8,7 +8,7 @@ tidy3a's ``test_notebooks.py``, plot3's ``test_masking.py`` and stats3's
 import pytest
 from dialects import ALL, PLOT3, STATS3, TIDY3, TIDY3A
 
-from tidysyntax import repair
+from tidysyntax import Dialect, repair
 
 
 @pytest.mark.parametrize(
@@ -135,3 +135,25 @@ def test_backtick_names(source, expected):
 def test_a_call_belonging_to_no_dialect_is_left_alone():
     assert repair("lm(y ~ x)", [TIDY3, TIDY3A, PLOT3]) == "lm(y ~ x)"
     assert repair("lm(y ~ x)", [STATS3]) == "lm('y ~ x')"
+
+
+BARE = Dialect("bare", negation_calls={"select"}, ordered_calls={"select"}, prefixes=())
+
+
+@pytest.mark.parametrize(
+    "source, dialects, expected",
+    [
+        # A dialect of bare calls only leaves df.select(...), a method, for Python to report.
+        ("df.select(a=NUM, b)", [BARE], "df.select(a=NUM, b)"),
+        ("df.select(!x)", [BARE], "df.select(!x)"),
+        ("select(a=NUM, b)", [BARE], "select(__r_assign__('a', (NUM)), b)"),
+        # tidy3 and tidy3a take any prefix: TidyFrame.select, ta.mutate.
+        ("df.select(a=NUM, b)", [TIDY3], "df.select(__r_assign__('a', (NUM)), b)"),
+        ("ta.mutate(c = 1, d)", [TIDY3A], "ta.mutate(__r_assign__('c', (1)), d)"),
+        # stats3 only its own name.
+        ("stats3.t_test(y ~ g)", [STATS3], "stats3.t_test('y ~ g')"),
+        ("s3.t_test(y ~ g)", [STATS3], "s3.t_test(y ~ g)"),
+    ],
+)
+def test_prefixes(source, dialects, expected):
+    assert repair(source, dialects) == expected

@@ -37,6 +37,10 @@ class Dialect:
     formula_keywords: frozenset[str] = frozenset()  # keywords whose value may be a formula (facets=)
     formula_backticks: Literal["keep", "strip"] = "keep"  # backtick names inside a quoted formula
     stages: tuple[Callable[[str], str], ...] = ()  # the package's own repairs, run after the shared ones
+    # Which module prefixes make ``prefix.name(...)`` one of these calls: None for any
+    # (``ta.filter``), an empty set for bare calls only (so ``df.select(...)``, a method,
+    # is never rewritten), or the names allowed (``{"stats3"}``).
+    prefixes: frozenset[str] | None = None
     # reinterpretations
     power_calls: frozenset[str] = frozenset()  # ^ -> **
     unary_formula_calls: frozenset[str] = frozenset()  # ~x -> "~x"
@@ -51,6 +55,8 @@ class Dialect:
             object.__setattr__(self, name, _names(getattr(self, name)))
         if self.exports is not None:
             object.__setattr__(self, "exports", _names(self.exports))
+        if self.prefixes is not None:
+            object.__setattr__(self, "prefixes", _names(self.prefixes))
         if not self.rule_after_column <= self.rule_calls:
             raise ValueError("rule_after_column must be a subset of rule_calls")
         if self.formula_backticks not in ("keep", "strip"):
@@ -70,6 +76,14 @@ class Dialect:
             names = frozenset(getattr(module, "__all__", ()) or (n for n in dir(module) if not n.startswith("_")))
         object.__setattr__(self, "exports", names)
         return names
+
+    def accepts_prefix(self, prefix: str | None) -> bool:
+        """Whether a call written ``prefix.name(...)`` (``None`` for a bare call) can be one of this dialect's."""
+        return prefix is None or self.prefixes is None or prefix in self.prefixes
+
+    def lists(self, field: str, name: str, prefix: str | None) -> bool:
+        """Whether the call ``prefix.name(...)`` is in this dialect's *field*."""
+        return name in getattr(self, field) and self.accepts_prefix(prefix)
 
     def owns_module(self, module: str | None) -> bool:
         """Whether a dotted module path belongs to this package."""

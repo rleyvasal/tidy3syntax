@@ -66,24 +66,33 @@ turns them into its column references inside its calls.
 
 ## Status
 
-Phase 1 of [the design](docs/design.md): the scanner, every repair, the
-ownership rule and the two reinterpretations. Not yet here: the IPython
-coordinator that installs one transformer for all packages, continuation lines
-(`>>` for tidy3, `+` for plot3), and entry points. No package uses tidysyntax
-yet.
+Phases 1 to 5 of [the design](docs/design.md): the scanner, every repair,
+the ownership rule and the two reinterpretations, and tidy3, tidy3a, plot3 and
+stats3 switched to them in their working trees (not yet released). Not yet
+here: the IPython coordinator that installs one transformer for all packages,
+continuation lines (`>>` for tidy3, `+` for plot3), and entry points.
 
-Where the output differs from a package's own rewrite today (the meaning is
-the same unless stated):
+Until every package's AST pass reads the neutral placeholders, each package
+calls only the repairs whose output the others already read, and tidy3 and
+plot3 turn `__r_name__` and `__r_assign__` back into their own names
+(`__tidy3_bt__`, `__tidy3_assign__`, `__plot3_bt__`). tidy3a writes
+`__r_assign__` and hands it to tidy3 as `__tidy3_assign__` in tidy3's calls.
+
+Where the output differs from a package's own rewrite before the switch:
 
 - stats3: a multi-line formula keeps its indentation and trailing comma
-  (`t_test(\n    'y ~ g',\n)`), and formulas are quoted under any module prefix
-  (`s3.t_test(...)`), not only `stats3.`.
-- tidy3: prefixed calls (`t3.filter(!x)`, `t3.select(a = x, b)`) are repaired
-  too, and a backtick assignment is rewritten only as a call argument.
-- tidy3 and tidy3a: placeholders are `__r_name__` and `__r_assign__`, not
-  `__tidy3_bt__`, `__tidy3_assign__` and `__tidy3a_assign__`.
+  (`t_test(\n    'y ~ g',\n)`), and backtick names in formulas are kept.
+- tidy3: a keyword before a positional argument in a method call
+  (`df.select(a = x, b)`) is rewritten like the verb, as `!` in one already
+  was; backticks inside strings and comments stay; a backtick assignment is
+  rewritten only as a call argument.
+- tidy3a: its placeholder is `__r_assign__` (it still reads `__tidy3a_assign__`).
 - plot3: a placeholder another package left inside a one-sided facet formula
   (`facet_wrap(~__tidy3_bt__('a b'))`) becomes the name again: `'~a b'`.
+
+`scripts/family/` runs all five suites together on another machine: `sync.sh`
+copies the working trees and starts `run.sh` in a tmux session there, and
+`status.sh` reports each suite's result and failures.
 
 Known limits: a Python 3.12 f-string that nests the same quote
 (`f"{d["k"]}"`) is read as two strings, so a rewrite may see code inside it.

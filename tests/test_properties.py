@@ -54,6 +54,7 @@ CORPUS = _corpus()
 LEFT_FOR_PYTHON = {
     "other(y ~ g)",
     "group_by(axis = 'g', lat)",
+    "s3.t_test(y ~ g)",
     "geom_function(lambda x: x ^ 2) + facet_wrap(~cyl)\nif:",
 }
 

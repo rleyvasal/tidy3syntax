@@ -22,6 +22,7 @@ from collections.abc import Iterable, Sequence
 from tidysyntax.dialect import Dialect
 from tidysyntax.placeholders import ASSIGN, NAME
 from tidysyntax.scanner import (
+    Call,
     Spans,
     apply,
     calls,
@@ -37,6 +38,11 @@ _NAME_CALL = re.compile(r"__(?:r_name|tidy3_bt|plot3_bt)__\((['\"])(.*?)\1\)")
 
 def _union(dialects: Iterable[Dialect], field: str) -> frozenset[str]:
     return frozenset().union(*(getattr(d, field) for d in dialects))
+
+
+def _listed(call: Call, dialects: Iterable[Dialect], field: str) -> bool:
+    """Whether some dialect lists *call*, with its prefix, in *field*."""
+    return any(d.lists(field, call.name, call.prefix) for d in dialects)
 
 
 def is_shell_cell(source: str) -> bool:
@@ -85,9 +91,9 @@ def quote_formulas(source: str, dialects: Sequence[Dialect]) -> str:
             if not tildes:
                 continue
             has_left = any(is_binary for _, is_binary in tildes)
-            if has_left and call.name not in binary:
+            if has_left and not _listed(call, dialects, "formula_calls"):
                 continue
-            if not has_left and (call.name not in unary or _parses(text)):
+            if not has_left and (not _listed(call, dialects, "unary_formula_calls") or _parses(text)):
                 continue
             edits.append((a, b, repr(formula_text(text, _strips(dialects, call.name)))))
     return _outermost_last(edits, source)
@@ -118,14 +124,15 @@ def rule_pairs(source: str, dialects: Sequence[Dialect]) -> str:
     names = _union(dialects, "rule_calls")
     if "~" not in source or not names:
         return source
-    after_column = _union(dialects, "rule_after_column")
-    return _until_settled(lambda source: _rules_pass(source, names, after_column), source)
+    return _until_settled(lambda source: _rules_pass(source, names, dialects), source)
 
 
-def _rules_pass(source: str, names: frozenset[str], after_column: frozenset[str]) -> str:
+def _rules_pass(source: str, names: frozenset[str], dialects: Sequence[Dialect]) -> str:
     spans = Spans.of(source)
     edits = []
     for call in calls(source, names, spans):
+        if not _listed(call, dialects, "rule_calls"):
+            continue
         for position, (a, b) in enumerate(call.arguments):
             text = source[a:b]
             if keyword(text) or text.lstrip().startswith("*"):
@@ -134,7 +141,7 @@ def _rules_pass(source: str, names: frozenset[str], after_column: frozenset[str]
             if not separators:
                 continue
             shown = text.strip()
-            if position == 0 and call.name in after_column:
+            if position == 0 and _listed(call, dialects, "rule_after_column"):
                 raise SyntaxError(f"{call.name}() takes the column first, then rules: {shown!r} is a rule, not a column")
             if len(separators) > 1:
                 raise SyntaxError(
@@ -162,7 +169,7 @@ def negation(source: str, dialects: Sequence[Dialect]) -> str:
     if "!" not in source or not names:
         return source
     spans = Spans.of(source)
-    inside = [(call.open, call.close) for call in calls(source, names, spans)]
+    inside = [(call.open, call.close) for call in calls(source, names, spans) if _listed(call, dialects, "negation_calls")]
     edits = [
         (i, i + 1, "~")
         for i in spans.code_indices()
@@ -245,12 +252,14 @@ def keywords_before_positional(source: str, dialects: Sequence[Dialect]) -> str:
     if "=" not in source or not names:
         return source
     settings = _union(dialects, "settings")
-    return _until_settled(lambda source: _keywords_pass(source, names, settings), source)
+    return _until_settled(lambda source: _keywords_pass(source, names, settings, dialects), source)
 
 
-def _keywords_pass(source: str, names: frozenset[str], settings: frozenset[str]) -> str:
+def _keywords_pass(source: str, names: frozenset[str], settings: frozenset[str], dialects: Sequence[Dialect]) -> str:
     edits = []
     for call in calls(source, names):
+        if not _listed(call, dialects, "ordered_calls"):
+            continue
         named = [keyword(source[a:b]) for a, b in call.arguments]
         positional = [
             i for i, ((a, b), kw) in enumerate(zip(call.arguments, named))

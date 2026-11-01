@@ -60,6 +60,6 @@ STATS3_FUNCTIONS = frozenset({
     "rlm", "rq", "shapiro_test", "t_test", "tukey_hsd", "var_test", "vcov_cl", "vcov_nw", "wilcox_test",
 })
 
-STATS3 = Dialect("stats3", formula_calls=STATS3_FUNCTIONS, exports=STATS3_FUNCTIONS)
+STATS3 = Dialect("stats3", formula_calls=STATS3_FUNCTIONS, prefixes={"stats3"}, exports=STATS3_FUNCTIONS)
 
 ALL = (TIDY3, TIDY3A, PLOT3, STATS3)

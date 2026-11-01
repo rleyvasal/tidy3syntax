@@ -17,3 +17,6 @@ First version: phase 1 of [the design](docs/design.md).
   cell, then the context), or in packages listed in `always=`.
 - `imported_names()` builds a context from earlier cells' imports, for exports
   that have no live namespace.
+- `Dialect.prefixes` says which module prefixes make `prefix.name(...)` one of
+  a dialect's calls: any (the default), none (bare calls only), or a set of
+  names, such as stats3's `{"stats3"}`.

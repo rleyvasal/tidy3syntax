@@ -1,6 +1,6 @@
 # A shared package for R syntax in notebooks
 
-Status: accepted 2026-11-01; phase 1 (§8) implemented in this repository.
+Status: accepted 2026-11-01; phases 1 to 5 (§8) implemented, not released: phase 1 in this repository, phases 2 to 5 in each package's working tree.
 
 tidy3, tidy3a, plot3 and stats3 each let notebook cells use R syntax that Python
 cannot parse: bare column names, `` `odd names` ``, `!` for negation, `name =
@@ -398,14 +398,33 @@ bound raised in each package, with no ported code.
 Each phase ends with every package's suite passing, and nothing is released before its exit check.
 
 1. **Create `tidysyntax` from tidy3's code.** tidy3's copy is the most complete, so it is the base. Move the scanner, `rewrite_backticks`, `rewrite_bang_not`, `rewrite_keywords_before_positional` and `rewrite_formula_rules`, generalised over dialects, plus stats3's and plot3's formula quoting, the ownership rule and the `^` and unary `~` reinterpretations from plot3's fix, and seed the corpus. Exit check: the corpus passes, including every tidy3 rewrite case unchanged. *Done 2026-11-01, not released:* `src/tidysyntax/`, 272 tests on Python 3.10 to 3.14. The cases whose text differs from a package's current output are listed in the README.
-2. **Switch tidy3**, keeping its old placeholders as aliases (§5). Exit check: tidy3's suite passes with no assertion changed except the placeholder names in rewritten text.
-3. **Switch tidy3a.** Delete its scanner, `rewrite_bang_not`, `rewrite_keywords_before_positional` and the carrier translation in `visit_Call`, and move `[x, y, z] = …` to a dialect stage. Exit check: `test_notebooks.py` passes, and the two-package tests pass in both load orders.
-4. **Switch stats3.** Replace `quote_formulas` with a dialect of formula calls; its bare-name pass stays. Exit check: stats3's `test_masking.py` passes.
-5. **Switch plot3.** Move backticks and binary `~` facet formulas onto `tidysyntax` as repairs, and `^`, unary `~` and unindented `+` continuation lines as reinterpretations gated by ownership. Delete its handling of tidy3's placeholders and its detection of tidy3's preparser. Exit check: the §6 regression cases pass in plot3's own suite.
+2. **Switch tidy3**, keeping its old placeholders as aliases (§5). Exit check: tidy3's suite passes with no assertion changed except the placeholder names in rewritten text. *Done 2026-11-01, not released:* tidy3 runs tidysyntax's repairs and turns the neutral placeholders back into `__tidy3_bt__` and `__tidy3_assign__`, which plot3, stats3 and tidy3a read today and `nb_export` writes; its AST pass also reads the neutral names. One assertion changed: `df.select(a=NUM, b)` is now rewritten like the verb, as `!` in a method call already was, instead of being left as a syntax error.
+3. **Switch tidy3a.** *Done 2026-11-01, not released:* it writes `__r_assign__`, still reads `__tidy3a_assign__`, and hands the placeholder to tidy3 as `__tidy3_assign__` in tidy3's calls. Delete its scanner, `rewrite_bang_not`, `rewrite_keywords_before_positional` and the carrier translation in `visit_Call`, and move `[x, y, z] = …` to a dialect stage. Exit check: `test_notebooks.py` passes, and the two-package tests pass in both load orders.
+4. **Switch stats3.** Replace `quote_formulas` with a dialect of formula calls; its bare-name pass stays. Exit check: stats3's `test_masking.py` passes. *Done 2026-11-01 in stats3's working tree, not released:* every existing case passes unchanged, and backtick names in formulas now work (`lm` reads them; `t_test`'s own formula parsing does not yet).
+
+Until every package's AST pass reads the neutral placeholders, a package that switches early calls only the repairs that leave none: stats3 calls `tidysyntax.repairs.quote_formulas`, not `repair`. Otherwise a stats3 pass running first would leave `__r_name__` in a tidy3 call, which tidy3 0.14 does not read. Each package widens to `repair` once tidy3 (phase 2) reads them.
+
+tidy3 0.14's backtick pass rewrites backticks inside string literals too. When it runs after another package's formula quoting, it breaks the quoted formula (`'`body mass` ~ sex'` becomes `'__tidy3_bt__('body mass') ~ sex'`). tidysyntax's backtick repair skips strings, so phase 2 fixes it; until then a backtick name in a stats3 formula works only when tidy3's notebook layer is not loaded.
+5. **Switch plot3.** *Done 2026-11-01 in plot3's working tree, on top of its unreleased facet-formula work, not released:* its scanner, facet formulas, `^` and ownership check are gone; it turns `__r_name__` back into `__plot3_bt__`, and joining `+` lines uses tidysyntax's `Owners`. Move backticks and binary `~` facet formulas onto `tidysyntax` as repairs, and `^`, unary `~` and unindented `+` continuation lines as reinterpretations gated by ownership. Delete its handling of tidy3's placeholders and its detection of tidy3's preparser. Exit check: the §6 regression cases pass in plot3's own suite.
 6. **Coordinator, continuation lines and ownership in the AST passes.** Install the single transformer and the entry points; move tidy3's `>>` and plot3's `+` continuation lines; let each package's AST pass use the shared `Owners`. Delete tidy3's plot3 hook and plot3 imports from `export.py`. Exit check: the four-package notebook passes in all 24 load orders.
 7. **Drop the old placeholder aliases** two minor releases after phase 2.
 
 Phases 2 to 5 are independent once phase 1 is released. Phase 6 needs all four.
+
+**Placeholder names during the switch.** A package that switches before the
+others cannot write the neutral names into the text: another package's pass
+may meet its calls first, and the others read only their own names. So until
+phase 6, tidy3 and plot3 turn `__r_name__` and `__r_assign__` back into their
+own names after the repairs; tidy3a writes `__r_assign__` because it already
+hands the placeholder to tidy3 in tidy3's calls; stats3 calls only the formula
+repair, which leaves none. Every AST pass reads both the neutral names and its
+old ones. Phase 6 makes the neutral names the only ones written.
+
+**Prefixes.** The packages differed on prefixed calls: tidy3's `!` rewrite
+covered method calls (`df.select(!x)`, TidyFrame's methods) while its keyword
+rewrite skipped them; tidy3a and plot3 took any prefix; stats3 took only
+`stats3.`. `Dialect.prefixes` says which prefixes count. tidy3, tidy3a and
+plot3 take any; stats3 keeps `{"stats3"}`.
 
 The §1.3 cases were bugs in plot3, independent of `tidysyntax`. plot3's working
 tree fixes them with its own ownership check (`plot3.masking.owned_calls` and
