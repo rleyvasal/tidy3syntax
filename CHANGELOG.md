@@ -1,8 +1,9 @@
 # Changelog
 
-## Unreleased
+## 0.1.0 — 2026-11-01
 
-First version: phase 1 of [the design](docs/design.md).
+First version: phases 1 to 5 of [the design](docs/design.md); tidy3, tidy3a,
+plot3 and stats3 use it from their next releases.
 
 - `Dialect` describes one package's R syntax as data: which calls take `!`,
   `name = value` before a positional argument, `left ~ right` rules (tidy3's

@@ -67,8 +67,8 @@ turns them into its column references inside its calls.
 ## Status
 
 Phases 1 to 5 of [the design](docs/design.md): the scanner, every repair,
-the ownership rule and the two reinterpretations, and tidy3, tidy3a, plot3 and
-stats3 switched to them in their working trees (not yet released). Not yet
+the ownership rule and the two reinterpretations, used by tidy3 0.15, tidy3a
+0.16, plot3 0.8 and stats3 0.6. Not yet
 here: the IPython coordinator that installs one transformer for all packages,
 continuation lines (`>>` for tidy3, `+` for plot3), and entry points.
 
