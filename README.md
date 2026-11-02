@@ -91,10 +91,9 @@ turns them into its column references inside its calls.
 
 Phases 1 to 5 of [the design](docs/design.md): the scanner, every repair,
 the ownership rule and the two reinterpretations, used by tidy3 0.15.1, tidy3a
-0.16.1, plot3 0.8.1 and stats3 0.6.1. Phase 6a, unreleased: continuation
-lines (`>>` for tidy3, `+` for plot3) and the coordinator. Phase 6b, each
-package registering with the coordinator instead of installing its own
-transformer, is next.
+0.16.1, plot3 0.8.1 and stats3 0.6.1. Phase 6: continuation lines (`>>` for
+tidy3, `+` for plot3) and the coordinator, in 0.1.2, which tidy3 0.16, tidy3a
+0.17, plot3 0.9 and stats3 0.7 register with.
 
 Until every package's AST pass reads the neutral placeholders, each package
 calls only the repairs whose output the others already read, and tidy3 and

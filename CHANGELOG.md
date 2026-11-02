@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.2 — 2026-11-01
 
 Phase 6a of [the design](docs/design.md): continuation lines and the coordinator.
 
