@@ -69,6 +69,10 @@ def test_layers(cell, expected):
         # tidy3 joined "+" after any pipe; now the pipe's last step must be plot3's.
         ("tidy(cars)\n>> filter(mpg > 20)\n+ geom_point()", None, "(tidy(cars)\n>> filter(mpg > 20))\n+ geom_point()"),
         ("tidy(cars)\n>> ggplot()\n+ geom_point()", None, "((tidy(cars)\n>> ggplot())\n+ geom_point())"),
+        # A pipe from a data frame into ggplot() takes every layer, not only the first (tidy3's README).
+        ("long\n>> ggplot(aes(x = species))\n+ geom_point()\n+ facet_wrap('measure')\n+ theme_bw()",
+         {"long": object()},
+         "((long\n>> ggplot(aes(x = species)))\n+ geom_point()\n+ facet_wrap('measure')\n+ theme_bw())"),
         # An indented "+" line is not Python, so it joins by name.
         ("x = 2\n  + geom_point()", None, "x = (2\n  + geom_point())"),
     ],

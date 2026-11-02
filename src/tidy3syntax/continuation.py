@@ -318,8 +318,8 @@ def _join(
                     (d for d in dialects if len(statement.tokens) > 1 and statement.tokens[1].string in d.layer_calls),
                     None,
                 )
-                head = [t for s in previous for t in s.tokens]
-                joins = dialect is not None and (indented or plus.head(head, dialect))
+                # The statement the group started with decides: layers already joined onto it count as its.
+                joins = dialect is not None and (indented or plus.head(previous[0].tokens, dialect))
         if joins:
             previous.append(statement)
         else:
