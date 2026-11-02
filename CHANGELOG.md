@@ -21,6 +21,11 @@ Phase 6a of [the design](docs/design.md): continuation lines and the coordinator
   whoever owns its calls, and `reinterpret="always"` does so for the session.
 - The integration test: tidy3, tidy3a, plot3 and stats3 in one notebook in
   all 24 load orders, in CI on pull requests, weekly, and before a release.
+- A `tidy3syntax.dialects` entry point names a function returning the
+  package's `Dialect`, which says where its notebook loader is
+  (`extension`) and how to apply its AST pass to source text for an export
+  (`mask`). `tidy3syntax.installed()` returns every installed package's
+  dialect, for rewriting without a notebook.
 
 ## 0.1.1 — 2026-11-01
 

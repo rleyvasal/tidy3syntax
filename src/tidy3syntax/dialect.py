@@ -48,6 +48,12 @@ class Dialect:
     layer_calls: frozenset[str] = frozenset()  # a "+ name(...)" line joins the statement above (plot3's layers)
     # The names the package exports; None reads the package's __all__ when first needed.
     exports: frozenset[str] | None = field(default=None, compare=False)
+    # The package's notebook loader, "module:function" taking the shell (its load_ipython_extension):
+    # the coordinator calls it for a cell that imports the package.
+    extension: str | None = field(default=None, compare=False)
+    # The package's AST pass on source text, given the names that are not columns (an export's
+    # imports and assignments): mask(source, known) -> source. None for a package without one.
+    mask: Callable[[str, frozenset[str]], str] | None = field(default=None, compare=False)
 
     def __post_init__(self) -> None:
         for name in (

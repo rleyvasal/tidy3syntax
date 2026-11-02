@@ -20,6 +20,13 @@ from tidy3syntax.pipeline import reinterpret, rewrite
 from tidy3syntax.placeholders import ASSIGN, NAME, RAssign, RName, runtime_values
 from tidy3syntax.repairs import repair
 
+
+def installed() -> list[Dialect]:
+    """The dialects of every installed package that declares a ``tidy3syntax.dialects`` entry point."""
+    from tidy3syntax.ipython import installed as found
+
+    return found()
+
 __all__ = [
     "ASSIGN",
     "NAME",
@@ -30,6 +37,7 @@ __all__ = [
     "RName",
     "__version__",
     "imported_names",
+    "installed",
     "module_of",
     "owned_calls",
     "reinterpret",

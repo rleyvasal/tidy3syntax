@@ -129,3 +129,29 @@ def test_shell_lines_and_placeholders(shell):
     coordinator.register(shell, VERBS)
     ns = run(shell, "out = !echo hi\nname = __r_name__('a b')")
     assert list(ns["out"]) == ["hi"] and ns["name"] == "a b"
+
+
+def _entry_points(monkeypatch, *points):
+    from importlib.metadata import EntryPoint
+
+    found = [EntryPoint(name, value, coordinator.ENTRY_POINTS) for name, value in points]
+    monkeypatch.setattr(coordinator.metadata, "entry_points", lambda group: found)
+    monkeypatch.setattr(coordinator, "_ENTRY_CACHE", None)
+
+
+def test_entry_points_name_a_function_returning_the_dialect(shell, monkeypatch):
+    module = sys.modules["fakeplot"]
+    module.loaded = []
+    module.dialect = lambda: Dialect(
+        "fakeplot", power_calls={"geom_function"}, exports={"geom_function"},
+        extension="fakeplot:load", mask=lambda source, known: source.replace("MASKED", "masked"),
+    )
+    module.load = lambda shell: (module.loaded.append(shell), coordinator.register(shell, module.dialect()))
+    _entry_points(monkeypatch, ("fakeplot", "fakeplot:dialect"), ("broken", "nowhere_at_all:dialect"))
+
+    assert [d.package for d in coordinator.installed()] == ["fakeplot"]
+    assert coordinator.installed()[0].mask("MASKED", frozenset()) == "masked"
+
+    coordinator.register(shell, VERBS)
+    ns = run(shell, "from fakeplot import geom_function\nr = geom_function(lambda x: x ^ 2)")
+    assert ns["r"] == 9 and module.loaded == [shell]

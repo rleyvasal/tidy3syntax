@@ -9,9 +9,9 @@ each cell it moves itself back to the front of that list, ahead of anything
 appended since (CRAFT's router, which tidy3 kept behind by the same means).
 
 A cell that imports a package declaring a ``tidy3syntax.dialects`` entry
-point, not yet registered, gets that package's syntax at once: the entry
-point (a function taking the shell) is called before the cell is rewritten,
-so ``from plot3 import *`` and ``aes(x=wt)`` work in one cell.
+point, not yet registered, gets that package's syntax at once: its dialect's
+``extension`` (the package's notebook loader) is called before the cell is
+rewritten, so ``from plot3 import *`` and ``aes(x=wt)`` work in one cell.
 
 Explicit scopes widen reinterpretations: ``%%tidy3syntax plot3`` as a cell's
 first line for that cell, or ``register(..., reinterpret="always")`` for the
@@ -207,7 +207,8 @@ _ENTRY_CACHE: dict[str, Callable[[Any], Any]] | None = None
 
 
 def _entry_points() -> dict[str, Callable[[Any], Any]]:
-    """Package name -> its notebook loader, from the ``tidy3syntax.dialects`` entry points, read once."""
+    """Package name -> a function that loads its notebook support into a shell, read once from the
+    ``tidy3syntax.dialects`` entry points (each names a function returning the package's dialect)."""
     global _ENTRY_CACHE
     if _ENTRY_CACHE is None:
         found: dict[str, Callable[[Any], Any]] = {}
@@ -223,9 +224,47 @@ def _entry_points() -> dict[str, Callable[[Any], Any]]:
 
 def _lazy(point: Any) -> Callable[[Any], Any]:
     def load(shell: Any) -> Any:
-        return point.load()(shell)
+        dialect = _dialect_of(point)
+        if dialect is None or dialect.extension is None:
+            return None
+        return _import(dialect.extension)(shell)
 
     return load
+
+
+def _dialect_of(point: Any) -> Dialect | None:
+    """The dialect an entry point names: a Dialect, or a function returning one."""
+    found = point.load()
+    if callable(found) and not isinstance(found, Dialect):
+        found = found()
+    return found if isinstance(found, Dialect) else None
+
+
+def _import(path: str) -> Callable[..., Any]:
+    module, _, name = path.partition(":")
+    target: Any = __import__(module, fromlist=[name])
+    for part in name.split("."):
+        target = getattr(target, part)
+    return target
+
+
+def installed() -> list[Dialect]:
+    """The dialects of every installed package that declares a ``tidy3syntax.dialects``
+    entry point, for rewriting without a notebook (an export). A package whose entry
+    point fails to load is left out."""
+    found = []
+    try:
+        points = metadata.entry_points(group=ENTRY_POINTS)
+    except Exception:
+        points = ()
+    for point in points:
+        try:
+            dialect = _dialect_of(point)
+        except Exception:
+            continue
+        if dialect is not None:
+            found.append(dialect)
+    return sorted(found, key=lambda d: d.package)
 
 
 def _imported_packages(source: str) -> set[str]:
