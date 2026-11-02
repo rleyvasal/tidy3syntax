@@ -95,7 +95,7 @@ the ownership rule and the two reinterpretations, used by tidy3 0.15.1, tidy3a
 tidy3, `+` for plot3) and the coordinator, in 0.1.2, which tidy3 0.16, tidy3a
 0.17, plot3 0.9 and stats3 0.7 register with.
 
-Phase 7 (unreleased): `__r_name__` and `__r_assign__` are the only
+Phase 7, in 0.2.0: `__r_name__` and `__r_assign__` are the only
 placeholders any package writes or reads; the packages' own names from before
 (`__tidy3_bt__`, `__plot3_bt__`) are gone. Inside its own calls each
 package's AST pass renames `__r_assign__` to a private name of its own
