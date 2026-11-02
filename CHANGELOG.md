@@ -6,6 +6,10 @@ Phase 7 of [the design](docs/design.md).
 
 ### Changed
 
+- `Dialect.mask` takes the notebook's imports as a third argument,
+  `mask(source, known, context)`, so a package's export masking can tell its
+  own calls from another package's; `Dialect.export_imports` lists the lines
+  an exported script needs once the mask changed something (`import tidy3a`).
 - A formula being quoted turns only `__r_name__` back into a backtick name;
   tidy3's `__tidy3_bt__` and plot3's `__plot3_bt__`, which no release of
   either writes since tidy3 0.17 and plot3 0.10, are no longer read.

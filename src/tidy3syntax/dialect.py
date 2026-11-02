@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import importlib
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, field
-from typing import Literal
+from typing import Any, Literal
 
 
 def _names(values: Iterable[str]) -> frozenset[str]:
@@ -51,9 +51,13 @@ class Dialect:
     # The package's notebook loader, "module:function" taking the shell (its load_ipython_extension):
     # the coordinator calls it for a cell that imports the package.
     extension: str | None = field(default=None, compare=False)
-    # The package's AST pass on source text, given the names that are not columns (an export's
-    # imports and assignments): mask(source, known) -> source. None for a package without one.
-    mask: Callable[[str, frozenset[str]], str] | None = field(default=None, compare=False)
+    # The package's AST pass on source text, for an export: mask(source, known, context) -> source,
+    # where known holds the names that are not columns (the notebook's imports and assignments) and
+    # context maps the names the notebook imports to their modules (ownership.imported_names). The
+    # result is public code a plain script can run, given the dialect's export_imports.
+    mask: Callable[[str, frozenset[str], Mapping[str, Any]], str] | None = field(default=None, compare=False)
+    # Lines an exported script needs once the mask has changed a cell ("import tidy3a").
+    export_imports: tuple[str, ...] = field(default=(), compare=False)
 
     def __post_init__(self) -> None:
         for name in (

@@ -144,13 +144,13 @@ def test_entry_points_name_a_function_returning_the_dialect(shell, monkeypatch):
     module.loaded = []
     module.dialect = lambda: Dialect(
         "fakeplot", power_calls={"geom_function"}, exports={"geom_function"},
-        extension="fakeplot:load", mask=lambda source, known: source.replace("MASKED", "masked"),
+        extension="fakeplot:load", mask=lambda source, known, context: source.replace("MASKED", "masked"),
     )
     module.load = lambda shell: (module.loaded.append(shell), coordinator.register(shell, module.dialect()))
     _entry_points(monkeypatch, ("fakeplot", "fakeplot:dialect"), ("broken", "nowhere_at_all:dialect"))
 
     assert [d.package for d in coordinator.installed()] == ["fakeplot"]
-    assert coordinator.installed()[0].mask("MASKED", frozenset()) == "masked"
+    assert coordinator.installed()[0].mask("MASKED", frozenset(), {}) == "masked"
 
     coordinator.register(shell, VERBS)
     ns = run(shell, "from fakeplot import geom_function\nr = geom_function(lambda x: x ^ 2)")
