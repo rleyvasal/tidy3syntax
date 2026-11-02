@@ -1,10 +1,15 @@
 # Changelog
 
+## 0.1.1 — 2026-11-01
+
+The first release as `tidy3syntax`, the tidy3 family's name; tidy3 0.15.1,
+tidy3a 0.16.1, plot3 0.8.1 and stats3 0.6.1 use it. The code is 0.1.0's.
+0.1.0 was published as `tidysyntax`, which this name supersedes.
+
 ## 0.1.0 — 2026-11-01
 
-First version: phases 1 to 5 of [the design](docs/design.md); tidy3 0.15.1,
-tidy3a 0.16.1, plot3 0.8.1 and stats3 0.6.1 use it. The same code was
-published the same day as `tidysyntax` 0.1.0, which this name supersedes.
+First version, published as `tidysyntax`: phases 1 to 5 of
+[the design](docs/design.md).
 
 - `Dialect` describes one package's R syntax as data: which calls take `!`,
   `name = value` before a positional argument, `left ~ right` rules (tidy3's
