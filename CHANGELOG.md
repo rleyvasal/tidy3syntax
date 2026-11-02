@@ -1,5 +1,27 @@
 # Changelog
 
+## Unreleased
+
+Phase 6a of [the design](docs/design.md): continuation lines and the coordinator.
+
+- Continuation lines. A line starting with one of a dialect's
+  `pipe_operators` (tidy3's `>>`) continues the statement above, a repair; a
+  pipe that still does not parse is joined with backslashes, so Python
+  reports its real error. A `+ name(...)` line, for a dialect's
+  `layer_calls` (plot3's layers), joins by name when indented and, when not,
+  only if the call is the package's own and the statement above is one of
+  its plots (`ggplot(...)`, a pipe ending in one, or a variable not known to
+  hold something else). Joined lines keep their line numbers.
+- `tidy3syntax.ipython`, the coordinator: `register(shell, dialect,
+  ast_transformer=...)` puts every package's syntax in one input
+  transformer, whatever the load order, kept first before each cell;
+  `unregister`, `enable` and `registered` go with it. A cell that imports a
+  package with a `tidy3syntax.dialects` entry point gets that package's
+  syntax in the same cell. `%%tidy3syntax <package>` reinterprets one cell
+  whoever owns its calls, and `reinterpret="always"` does so for the session.
+- The integration test: tidy3, tidy3a, plot3 and stats3 in one notebook in
+  all 24 load orders, in CI on pull requests, weekly, and before a release.
+
 ## 0.1.1 — 2026-11-01
 
 The first release as `tidy3syntax`, the tidy3 family's name; tidy3 0.15.1,

@@ -37,6 +37,7 @@ class Dialect:
     formula_keywords: frozenset[str] = frozenset()  # keywords whose value may be a formula (facets=)
     formula_backticks: Literal["keep", "strip"] = "keep"  # backtick names inside a quoted formula
     stages: tuple[Callable[[str], str], ...] = ()  # the package's own repairs, run after the shared ones
+    pipe_operators: frozenset[str] = frozenset()  # a line starting with one continues the statement above (">>")
     # Which module prefixes make ``prefix.name(...)`` one of these calls: None for any
     # (``ta.filter``), an empty set for bare calls only (so ``df.select(...)``, a method,
     # is never rewritten), or the names allowed (``{"stats3"}``).
@@ -44,13 +45,15 @@ class Dialect:
     # reinterpretations
     power_calls: frozenset[str] = frozenset()  # ^ -> **
     unary_formula_calls: frozenset[str] = frozenset()  # ~x -> "~x"
+    layer_calls: frozenset[str] = frozenset()  # a "+ name(...)" line joins the statement above (plot3's layers)
     # The names the package exports; None reads the package's __all__ when first needed.
     exports: frozenset[str] | None = field(default=None, compare=False)
 
     def __post_init__(self) -> None:
         for name in (
             "negation_calls", "ordered_calls", "settings", "rule_calls", "rule_after_column",
-            "formula_calls", "formula_keywords", "power_calls", "unary_formula_calls",
+            "formula_calls", "formula_keywords", "power_calls", "unary_formula_calls", "pipe_operators",
+            "layer_calls",
         ):
             object.__setattr__(self, name, _names(getattr(self, name)))
         if self.exports is not None:
@@ -91,4 +94,4 @@ class Dialect:
 
     @property
     def reinterprets(self) -> bool:
-        return bool(self.power_calls or self.unary_formula_calls)
+        return bool(self.power_calls or self.unary_formula_calls or self.layer_calls)

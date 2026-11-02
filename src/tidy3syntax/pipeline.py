@@ -13,6 +13,7 @@ import ast
 from collections.abc import Collection, Mapping, Sequence
 from typing import Any
 
+from tidy3syntax import continuation
 from tidy3syntax.dialect import Dialect
 from tidy3syntax.ownership import owned_calls
 from tidy3syntax.repairs import formula_text, is_shell_cell, repair
@@ -38,11 +39,18 @@ def rewrite(
     *context* answers who owns a name the cell does not bind: an IPython
     namespace, or ``imported_names(...)`` of earlier cells. *always* lists
     packages whose reinterpretations apply whoever owns the call.
+
+    The repairs run first, then continuation lines are joined (``>>`` by
+    name, ``+`` by ownership), then ``^`` and ``~x`` are reinterpreted. A
+    pipe that still does not parse is joined with backslashes, so Python
+    reports its real error.
     """
     if is_shell_cell(source):
         return source
     source = repair(source, dialects)
-    return reinterpret(source, dialects, context, always)
+    source = continuation.join(source, dialects, context, always)
+    source = reinterpret(source, dialects, context, always)
+    return continuation.join_broken(source, dialects)
 
 
 def reinterpret(

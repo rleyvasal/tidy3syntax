@@ -20,6 +20,7 @@ TIDY3 = Dialect(
               "weight", "where", "wt"},
     rule_calls={"case_when", "replace_when", "case_match", "recode_values", "replace_values"},
     rule_after_column={"replace_when", "case_match", "recode_values", "replace_values"},
+    pipe_operators={">>"},
     exports=TIDY3_VERBS | {"tidy", "col", "n", "is_na", "starts_with"},
 )
 
@@ -47,6 +48,7 @@ PLOT3 = Dialect(
     formula_backticks="strip",
     power_calls={"geom_function", "geom_vector_field"},
     unary_formula_calls={"facet_wrap", "facet_grid"},
+    layer_calls={"geom_point", "geom_function", "facet_wrap", "facet_grid", "scale_x_log10", "theme_bw", "plot_layout"},
     exports={"ggplot", "aes", "geom_point", "geom_function", "geom_vector_field", "facet_wrap", "facet_grid",
              "scale_x_log10", "theme_bw", "plot_layout"},
 )

@@ -20,6 +20,29 @@ ts.rewrite('df >> filter(!is_na(x)) >> select(Cus = NUM, Row)', [stats3, tidy3])
 # "df >> filter(~is_na(x)) >> select(__r_assign__('Cus', (NUM)), Row)"
 ```
 
+## In a notebook
+
+A package's notebook extension registers its dialect with the coordinator,
+which installs one input transformer for every package:
+
+```python
+import tidy3syntax.ipython
+
+def load_ipython_extension(shell):
+    tidy3syntax.ipython.register(shell, DIALECT, ast_transformer=MyMaskTransformer(shell.user_ns))
+```
+
+A package can also declare an entry point, so a cell that imports it gets
+its syntax in that same cell:
+
+```toml
+[project.entry-points."tidy3syntax.dialects"]
+plot3 = "plot3.jupyter:load_ipython_extension"
+```
+
+`%%tidy3syntax plot3` as a cell's first line reinterprets that cell's calls
+whoever owns them.
+
 ## Two kinds of rewrite
 
 **Repairs** change only text that is a syntax error in Python, so no valid
@@ -68,9 +91,10 @@ turns them into its column references inside its calls.
 
 Phases 1 to 5 of [the design](docs/design.md): the scanner, every repair,
 the ownership rule and the two reinterpretations, used by tidy3 0.15.1, tidy3a
-0.16.1, plot3 0.8.1 and stats3 0.6.1. Not yet
-here: the IPython coordinator that installs one transformer for all packages,
-continuation lines (`>>` for tidy3, `+` for plot3), and entry points.
+0.16.1, plot3 0.8.1 and stats3 0.6.1. Phase 6a, unreleased: continuation
+lines (`>>` for tidy3, `+` for plot3) and the coordinator. Phase 6b, each
+package registering with the coordinator instead of installing its own
+transformer, is next.
 
 Until every package's AST pass reads the neutral placeholders, each package
 calls only the repairs whose output the others already read, and tidy3 and
