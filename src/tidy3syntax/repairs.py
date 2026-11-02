@@ -32,8 +32,8 @@ from tidy3syntax.scanner import (
 )
 
 _BACKTICK = re.compile(r"`([^`\n]+)`")
-# Placeholders a package's own pass may have left before tidy3syntax ran (tidy3, plot3), and tidy3syntax's own.
-_NAME_CALL = re.compile(r"__(?:r_name|tidy3_bt|plot3_bt)__\((['\"])(.*?)\1\)")
+# A backtick name another rewrite already turned into the placeholder, inside a formula being quoted.
+_NAME_CALL = re.compile(r"__r_name__\((['\"])(.*?)\1\)")
 
 
 def _union(dialects: Iterable[Dialect], field: str) -> frozenset[str]:

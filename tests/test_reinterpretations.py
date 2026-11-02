@@ -38,8 +38,8 @@ USER_GEOM_FUNCTION = "def geom_function(fun):\n    return fun(3)\n"
         ("facet_wrap( ~ cyl , ncol=2)", "facet_wrap( '~ cyl' , ncol=2)"),
         ("p + facet_wrap(\n    ~ gear,\n    ncol=2)", "p + facet_wrap(\n    '~ gear',\n    ncol=2)"),
         ('facet_wrap("~cyl")', None),
-        # tidy3's backtick placeholder, left by a pass that ran first, keeps its name inside the formula.
-        ("facet_wrap(~__tidy3_bt__('my col'))", "facet_wrap('~my col')"),
+        # A backtick name the backtick repair already rewrote keeps its name inside the formula.
+        ("facet_wrap(~__r_name__('my col'))", "facet_wrap('~my col')"),
     ],
 )
 def test_only_plot3_calls_are_reinterpreted(cell, expected):

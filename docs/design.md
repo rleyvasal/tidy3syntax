@@ -1,6 +1,6 @@
 # A shared package for R syntax in notebooks
 
-Status: accepted 2026-11-01; phases 1 to 6 (§8) implemented and released (tidy3syntax 0.1.2, tidy3 0.16.0, tidy3a 0.17.0, plot3 0.9.0, stats3 0.7.0); phase 7 to come.
+Status: accepted 2026-11-01; phases 1 to 6 (§8) implemented and released (tidy3syntax 0.1.2, tidy3 0.16.0, tidy3a 0.17.0, plot3 0.9.0, stats3 0.7.0); phase 7 implemented, not released.
 
 tidy3, tidy3a, plot3 and stats3 each let notebook cells use R syntax that Python
 cannot parse: bare column names, `` `odd names` ``, `!` for negation, `name =
@@ -412,7 +412,7 @@ tidy3 0.14's backtick pass rewrites backticks inside string literals too. When i
    - **6c.** The integration test passes against the four packages' releases. *Done 2026-11-01:* tidy3syntax's CI installed tidy3 0.16.0, tidy3a 0.17.0, plot3 0.9.0 and stats3 0.7.0 from PyPI with tidy3syntax 0.1.2, and all 24 load orders passed.
 
    Progress (2026-11-02): 6a is committed (continuation lines, the coordinator, the integration test). 6b is done in the four packages' working trees, not released: each registers with the coordinator and declares an entry point; stats3, tidy3a and plot3 read `__r_name__` as a column; each AST pass renames `__r_assign__` to its own private name inside its own calls (`__tidy3_assign__`, `__tidy3a_assign__`), since the shared name's value in the namespace can belong to no single package; plot3's AST pass checks ownership with `Owners`; tidy3a takes `>>` continuation lines; tidy3's `pre_run_cell` hook and plot3 hook are gone, and plot3 no longer looks for tidy3's preparser. tidy3's `nb_export`, partial runs and CRAFT path rewrite through tidy3syntax as well (2026-11-02): an entry point names a function returning the package's dialect, whose `extension` is its notebook loader and whose `mask` applies its AST pass to source text; `tidy3syntax.installed()` lists them, so `export.py` finds plot3 without importing it. tidy3a's and stats3's dialects have no `mask` yet: their AST passes write internal names an export cannot turn into public code, and tidy3's export did not handle them before either. At release, tidy3 should require the plot3 release that has the entry point.
-7. **Drop the old placeholder aliases** two minor releases after phase 2.
+7. **Drop the old placeholder aliases** two minor releases after phase 2. *Done 2026-11-01, one minor release after phase 2 at the owner's choice, not released:* the source passes write only `__r_name__` and `__r_assign__`, and no AST pass reads `__tidy3_bt__` or `__plot3_bt__`, or another package's assignment name; tidy3a no longer hands `__r_assign__` to tidy3. What stays are the private runtime names each AST pass renames `__r_assign__` to inside its own calls (`__tidy3_assign__`, `__tidy3a_assign__`), which no source text holds; scripts `nb_export` wrote define `__tidy3_assign__` themselves, so they keep running. A notebook mixing these releases with tidy3 0.15, tidy3a 0.16, plot3 0.8 or stats3 0.6 or older can lose backtick names in the other package's calls.
 
 Phases 2 to 5 are independent once phase 1 is released. Phase 6 needs all four.
 

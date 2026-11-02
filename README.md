@@ -95,11 +95,12 @@ the ownership rule and the two reinterpretations, used by tidy3 0.15.1, tidy3a
 tidy3, `+` for plot3) and the coordinator, in 0.1.2, which tidy3 0.16, tidy3a
 0.17, plot3 0.9 and stats3 0.7 register with.
 
-Until every package's AST pass reads the neutral placeholders, each package
-calls only the repairs whose output the others already read, and tidy3 and
-plot3 turn `__r_name__` and `__r_assign__` back into their own names
-(`__tidy3_bt__`, `__tidy3_assign__`, `__plot3_bt__`). tidy3a writes
-`__r_assign__` and hands it to tidy3 as `__tidy3_assign__` in tidy3's calls.
+Phase 7 (unreleased): `__r_name__` and `__r_assign__` are the only
+placeholders any package writes or reads; the packages' own names from before
+(`__tidy3_bt__`, `__plot3_bt__`) are gone. Inside its own calls each
+package's AST pass renames `__r_assign__` to a private name of its own
+(`__tidy3_assign__`, `__tidy3a_assign__`), since the shared name's value in a
+namespace can belong to no single package.
 
 Where the output differs from a package's own rewrite before the switch:
 
@@ -109,9 +110,10 @@ Where the output differs from a package's own rewrite before the switch:
   (`df.select(a = x, b)`) is rewritten like the verb, as `!` in one already
   was; backticks inside strings and comments stay; a backtick assignment is
   rewritten only as a call argument.
-- tidy3a: its placeholder is `__r_assign__` (it still reads `__tidy3a_assign__`).
-- plot3: a placeholder another package left inside a one-sided facet formula
-  (`facet_wrap(~__tidy3_bt__('a b'))`) becomes the name again: `'~a b'`.
+- tidy3a: its placeholder is `__r_assign__`.
+- plot3: a backtick name inside a one-sided facet formula that another
+  package's rewrite reached first (`facet_wrap(~__r_name__('a b'))`) becomes
+  the name again: `'~a b'`.
 
 `scripts/family/` runs all five suites together on another machine: `sync.sh`
 copies the working trees and starts `run.sh` in a tmux session there, and

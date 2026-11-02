@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+Phase 7 of [the design](docs/design.md).
+
+### Changed
+
+- A formula being quoted turns only `__r_name__` back into a backtick name;
+  tidy3's `__tidy3_bt__` and plot3's `__plot3_bt__`, which no release of
+  either writes since tidy3 0.17 and plot3 0.10, are no longer read.
+
 ## 0.1.2 — 2026-11-01
 
 Phase 6a of [the design](docs/design.md): continuation lines and the coordinator.
